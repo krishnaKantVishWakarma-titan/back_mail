@@ -6,18 +6,6 @@ const ses = new AWS.SES({
   region: "eu-north-1",
 });
 
-// const getSendStatistics = () => {
-//   // Call the getSendStatistics method
-//   ses.getSendStatistics({}, (err, data) => {
-//       if (err) {
-//           console.error("Error fetching send statistics:", err);
-//       } else {
-//           console.log("Sending statistics:", data);
-//       }
-//   });
-// }
-// getSendStatistics();
-
 async function sendEmail(to, subject, body) {
   const params = {
     Destination: {
@@ -29,10 +17,10 @@ async function sendEmail(to, subject, body) {
           Charset: "UTF-8",
           Data: body,
         },
-        Html: {
-          Charset: "UTF-8",
-          Data: "<html><body><h1>Hello</h1><p>This is a test email sent using Amazon SES!</p></body></html>",
-        },
+        // Html: {
+        //   Charset: "UTF-8",
+        //   Data: "<html><body><h1>Hello</h1><p>This is a test email sent using Amazon SES!</p></body></html>",
+        // },
       },
       Subject: {
         Charset: "UTF-8",
@@ -52,6 +40,36 @@ async function sendEmail(to, subject, body) {
   });
 }
 
+async function sendNewsletter(campaign) {
+  const params = {
+    Destination: {
+      ToAddresses: ["jeevankori28@gmail.com"],
+    },
+    Message: {
+      Body: {
+        Html: {
+          Charset: "UTF-8",
+          Data: campaign.content,
+        },
+      },
+      Subject: {
+        Charset: "UTF-8",
+        Data: campaign.subject,
+      },
+    },
+    Source: campaign.senderEmail, // Replace with your verified email address
+    ReplyToAddresses: [],
+  };
+
+  return ses.sendEmail(params, (err, data) => {
+    if (err) {
+      console.error("Error sending email:", err);
+    } else {
+      console.log("Email sent successfully:", data);
+    }
+  });
+}
+
 // sendEmail("krishnakantvish.24@gmail.com", "test 10", "test 10")
 
-module.exports = { sendEmail };
+module.exports = { sendEmail, sendNewsletter, ses };

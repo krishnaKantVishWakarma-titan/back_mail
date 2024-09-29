@@ -40,6 +40,10 @@ app.use(express.json({ extended: false }));
 
 app.use("/api/auth", require("./src/routes/authRoutes"));
 app.use("/api/tasks", require("./src/routes/taskRoutes"));
+app.use("/api/contact", require("./src/routes/contactRoutes"));
+app.use("/api/emailCampaign", require("./src/routes/emailCampaignRoutes"));
+app.use("/api/user", require("./src/routes/userRoutes"));
+app.use("/api/domain", require("./src/routes/domainRoutes"));
 
 // Health check route
 app.get("/", async (req, res) => {

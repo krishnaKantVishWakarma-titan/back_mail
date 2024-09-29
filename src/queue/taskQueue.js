@@ -1,6 +1,7 @@
 const Task = require("../models/taskModel");
 const Queue = require("bull");
-const { sendEmail } = require("../../aws_run1");
+const { sendEmail, sendNewsletter } = require("../../aws_run1");
+const EmailCampaign = require("../models/emailCampaignModel");
 
 const emailQueue = new Queue("emailTasks", {
   redis: {
@@ -12,21 +13,15 @@ const emailQueue = new Queue("emailTasks", {
 
 // Worker
 emailQueue.process(async (job, done) => {
-  // await new Promise(resolve => setTimeout(resolve, 60000));
-  const resEmail = await sendEmail(
-    job.data.email[0],
-    job.data.subject,
-    job.data.body
-  );
-  console.log("res email: ", resEmail);
   console.log("job", job);
-  await Task.findByIdAndUpdate(
-    job.data.taskId,
+  await sendNewsletter(job.data.campaign);
+  await EmailCampaign.findByIdAndUpdate(
+    { _id: job.data.campaign._id },
     {
-      status: "Completed",
-      // response: res
-    },
-    { new: true }
+      $set: {
+        status: "sent",
+      },
+    }
   );
   console.log("job done");
   done();
